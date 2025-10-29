@@ -55,31 +55,31 @@ def calculate_wallet_metrics(wallet, trades):
             "pnl": 0,
             "recent_activity": 0
         }
-    
+
     buy_trades = 0
     sell_trades = 0
     recent_activity = 0
-    
+
     for trade in trades:
         if not isinstance(trade, dict):
             continue
-            
+
         ts = trade.get("time") or trade.get("timestamp") or trade.get("ts")
         if ts:
             ts = int(ts/1000) if ts > 1e12 else int(ts)
             if ts > time.time() - LOOKBACK_SECONDS:
                 recent_activity += 1
-        
+
         trade_type = (trade.get("type") or trade.get("side") or "").lower()
-        
+
         if "buy" in trade_type or "receive" in trade_type or "mint" in trade_type:
             buy_trades += 1
         elif "sell" in trade_type or "send" in trade_type:
             sell_trades += 1
-    
+
     total_trades = buy_trades + sell_trades
     estimated_win_rate = (buy_trades / total_trades * 100) if total_trades > 0 else 0
-    
+
     return {
         "wallet": wallet,
         "total_trades": total_trades,
@@ -97,13 +97,13 @@ def calculate_wallet_metrics(wallet, trades):
 def passes_quality_filters(metrics):
     if not metrics:
         return False
-    
+
     if metrics["total_trades"] < MIN_TOTAL_TRADES:
         return False
-    
+
     if metrics["recent_activity"] < MIN_RECENT_ACTIVITY:
         return False
-    
+
     return True
 
 def check_wallet_holdings(wallet, token):
@@ -127,10 +127,10 @@ def check_wallet_holdings(wallet, token):
 
 def scan_wallet_with_metrics(wallet_data):
     wallet, index, total = wallet_data
-    
+
     if index % 10 == 0:
         print(f"🔍 Progress: {index}/{total} wallets analyzed ({int(index/total*100)}%)")
-    
+
     trades_response = do_request(f"/wallet/{wallet}/trades", {"limit": 200})
     if isinstance(trades_response, dict):
         trades = trades_response.get("trades", [])
@@ -138,20 +138,20 @@ def scan_wallet_with_metrics(wallet_data):
         trades = trades_response
     else:
         return None, None
-    
+
     if not isinstance(trades, list):
         return None, None
-    
+
     metrics = calculate_wallet_metrics(wallet, trades)
-    
+
     if not passes_quality_filters(metrics):
         print(f"  ⚠️ Wallet {wallet[:8]}... filtered out (Trades: {metrics['total_trades']}, Recent: {metrics['recent_activity']})")
         return None, None
-    
+
     print(f"  ✅ Quality wallet {wallet[:8]}... (Trades: {metrics['total_trades']}, Recent Activity: {metrics['recent_activity']})")
-    
+
     token_to_wallets = defaultdict(set)
-    
+
     for tr in trades:
         if not isinstance(tr, dict):
             continue
@@ -175,13 +175,12 @@ def scan_wallet_with_metrics(wallet_data):
 
         if token:
             token_to_wallets[token].add(wallet)
-    
+
     time.sleep(REQUEST_DELAY)
     return token_to_wallets, metrics
 
 def generate_scan():
     print("🚀 Starting HYBRID scan with custom metrics...")
-    print(f"📊 Quality filters: Win Rate ≥ {MIN_WIN_RATE}%, Profitable Trades ≥ {MIN_PROFITABLE_TRADES}, ROI ≥ {MIN_ROI}%")
 
     top_data = do_request("/top-traders/all", {"limit": TOP_TRADERS_LIMIT})
     wallets_list = top_data.get("wallets") if isinstance(top_data, dict) else top_data
@@ -202,35 +201,35 @@ def generate_scan():
         return []
 
     wallet_data = [(w, i+1, len(wallets)) for i, w in enumerate(wallets)]
-    
+
     all_token_to_wallets = defaultdict(set)
     wallet_metrics_list = []
     quality_wallets = 0
-    
+
     print(f"⚡ Analyzing {len(wallets)} wallets with {MAX_WORKERS} parallel workers...")
     print("📈 Calculating custom metrics: PnL, Win Rate, ROI...")
-    
+
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         future_to_wallet = {executor.submit(scan_wallet_with_metrics, wd): wd for wd in wallet_data}
-        
+
         for future in as_completed(future_to_wallet):
             try:
                 token_data, metrics = future.result()
-                
+
                 if metrics:
                     wallet_metrics_list.append(metrics)
                     quality_wallets += 1
-                
+
                 if token_data:
                     for token, wallet_set in token_data.items():
                         all_token_to_wallets[token].update(wallet_set)
-                        
+
             except Exception as e:
                 print(f"❌ Wallet scan error: {e}")
 
     print(f"\n✨ Quality wallets passed filters: {quality_wallets}/{len(wallets)} ({int(quality_wallets/len(wallets)*100)}%)")
 
-    candidates = [{"token": tok, "wallets": list(ws), "count": len(ws)}
+    candidates = [{"token": tok, "wallets": list(ws), "count": len(ws)}\
                   for tok, ws in all_token_to_wallets.items() if len(ws) >= MIN_WALLETS_FOR_SIGNAL]
     candidates.sort(key=lambda x: x["count"], reverse=True)
 
@@ -242,7 +241,7 @@ def generate_scan():
 
     df_tokens = pd.DataFrame(candidates)
     df_tokens.to_csv("copurchase_signals.csv", index=False)
-    
+
     df_metrics = pd.DataFrame(wallet_metrics_list)
     df_metrics.to_csv("wallet_metrics.csv", index=False)
 
@@ -250,7 +249,7 @@ def generate_scan():
     print(f"📊 Tokens found: {len(candidates)}")
     print(f"💎 Quality traders analyzed: {quality_wallets}")
     print(f"📁 Files saved: copurchase_signals.json/csv, wallet_metrics.json/csv")
-    
+
     return candidates
 
 def check_token_holdings(token, wallets):
