@@ -20,8 +20,8 @@ MAX_WORKERS = 1  # Parallel workers (reduce to 1-2 if rate limiting)
 REQUEST_DELAY = 1  # Seconds between requests
 
 # Quality Filters (ACTUALLY USED)
-MIN_TOTAL_TRADES = 5  # Minimum trades in wallet history
-MIN_RECENT_ACTIVITY = 2  # Minimum trades in last 6 hours
+MIN_TOTAL_TRADES = 1  # Minimum trades in wallet history
+MIN_RECENT_ACTIVITY = 2  # Minimum trades in last 24 hours
 
 # Legacy/Unused (kept for future when PnL data available)
 MIN_WIN_RATE = 0.0
