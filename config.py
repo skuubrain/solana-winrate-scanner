@@ -7,10 +7,10 @@ API_KEYS = [
 BASE_URL = "https://data.solanatracker.io"
 
 # Solana Tracker Settings
-TOP_TRADERS_LIMIT = 500
+TOP_TRADERS_LIMIT = 3000
 
 # Time Window
-LOOKBACK_SECONDS = 12 * 60 * 60  # 6 hours
+LOOKBACK_SECONDS = 6 * 60 * 60  # 6 hours
 
 # Token Signal Settings
 MIN_WALLETS_FOR_SIGNAL = 2  # Minimum wallets buying same token
@@ -21,9 +21,9 @@ REQUEST_DELAY = 1  # Seconds between requests
 
 # Quality Filters (ACTUALLY USED)
 MIN_TOTAL_TRADES = 1  # Minimum trades in wallet history
-MIN_RECENT_ACTIVITY = 2  # Minimum trades in last 24 hours
+MIN_RECENT_ACTIVITY = 1  # Minimum trades in last 6 hours
 
 # Legacy/Unused (kept for future when PnL data available)
 MIN_WIN_RATE = 0.0
 MIN_PROFITABLE_TRADES = 1
-MIN_ROI = -50.0
+MIN_ROI = -100.0
