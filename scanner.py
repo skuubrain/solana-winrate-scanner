@@ -98,10 +98,10 @@ def passes_quality_filters(metrics):
     if not metrics:
         return False
     
-    if metrics["total_trades"] < MIN_PROFITABLE_TRADES:
+    if metrics["total_trades"] < MIN_TOTAL_TRADES:
         return False
     
-    if metrics["recent_activity"] < 1:
+    if metrics["recent_activity"] < MIN_RECENT_ACTIVITY:
         return False
     
     return True
