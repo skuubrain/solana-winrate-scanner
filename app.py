@@ -26,7 +26,7 @@ def home():
             last_scan = datetime.fromtimestamp(os.path.getmtime("copurchase_signals.json")).strftime("%Y-%m-%d %H:%M:%S")
         except:
             pass
-    
+
     if os.path.exists("wallet_metrics.json"):
         try:
             with open("wallet_metrics.json", "r") as f:
@@ -50,10 +50,10 @@ def api_scan():
 def api_metrics():
     if not os.path.exists("wallet_metrics.json"):
         return jsonify({"error": "No metrics data found"}), 404
-    
+
     with open("wallet_metrics.json", "r") as f:
         metrics = json.load(f)
-    
+
     return jsonify({"status": "success", "wallet_count": len(metrics), "metrics": metrics})
 
 @app.route("/check_holdings/<token>")
@@ -81,4 +81,4 @@ def check_holdings(token):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=False)
