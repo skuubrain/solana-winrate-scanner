@@ -1,0 +1,22 @@
+API_KEYS = [
+    "c89d3b53-74e2-42ac-8c0c-8b4f393d60bb",
+    "e6d255f4-d3ce-457f-b149-883b2f3e93e2"
+]
+
+BASE_URL = "https://data.solanatracker.io"
+
+TOP_TRADERS_LIMIT = 3000
+
+LOOKBACK_SECONDS = 6 * 60 * 60
+
+MIN_WALLETS_FOR_SIGNAL = 2
+
+MAX_WORKERS = 3
+
+REQUEST_DELAY = 0.5
+
+MIN_WIN_RATE = 0.0
+
+MIN_PROFITABLE_TRADES = 1
+
+MIN_ROI = -100.0
