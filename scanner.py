@@ -13,9 +13,8 @@ from config import (
     MIN_WALLETS_FOR_SIGNAL,
     MAX_WORKERS,
     REQUEST_DELAY,
-    MIN_WIN_RATE,
-    MIN_PROFITABLE_TRADES,
-    MIN_ROI
+    MIN_TOTAL_TRADES,
+    MIN_RECENT_ACTIVITY
 )
 
 key_index = 0
